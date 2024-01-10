@@ -29,13 +29,12 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       bluetoothController.status = "Connecting...";
     });
-    Future.delayed(const Duration(seconds: 5), () async {
-      isConnected =
-          await bluetoothController.bluetoothPrint.isConnected ?? false;
-    });
-
     try {
       await bluetoothController.connectDevice(device, macAddress);
+      Future.delayed(const Duration(seconds: 5), () async {
+        isConnected =
+            await bluetoothController.bluetoothPrint.isConnected ?? false;
+      });
       if (isConnected) {
         setState(() {
           bluetoothController.status = "Connected.";
@@ -86,10 +85,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    bluetoothController.bluetoothPrint.disconnect();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        appBar: AppBar( 
+        appBar: AppBar(
           title: Image.asset(
             'assets/images/clearvision-logo.png',
             width: double.infinity,
